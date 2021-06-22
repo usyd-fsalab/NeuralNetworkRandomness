@@ -89,7 +89,7 @@ python ./official/vision/image_classification/classifier_trainer.py --mode=train
 python ./official/vision/image_classification/classifier_trainer.py --mode=train_and_eval --model_type=resnet --dataset=imagenet --model_dir=./logs_algo_impl/ --data_dir=$IMAGENET_DATADIR --config_file=./official/vision/image_classification/configs/examples/resnet/imagenet/gpu.yaml --deterministic_init --deterministic_input --deterministic_tf
 ```
 
-## Deterministic Overhead
+## Measuring Deterministic Overhead
 We use nvprof profiler to collect GPU time duration. The performance data is collected over 100 training iterations.
 
 ```
