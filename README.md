@@ -1,6 +1,6 @@
 # NeuralNetworkRandomness
 
-This is the code repo for [Randomness in Neural Network Training: Characterizing the Impact of Tooling](https://todo). 
+This is the code repo for [Randomness in Neural Network Training: Characterizing the Impact of Tooling](https://arxiv.org/abs/2106.11872). 
 
 # Abstract
 The quest for determinism in machine learning has disproportionately focused on characterizing the impact of noise introduced by algorithmic design choices. In this work, we address a less well understood and studied question: how does our choice of tooling introduce randomness to deep neural network training. We conduct large scale experiments across different types of hardware, accelerators, state of art networks, and open-source datasets, to characterize how tooling choices contribute to the level of non-determinism in a system, the impact of said non-determinism, and the cost of eliminating different sources of noise.
@@ -101,6 +101,17 @@ nvprof python -m training_script --model_name resnet50 --batch_size 128 --data_d
 ```
 
 # Cite This Paper
-TODO
 ```
+@article{DBLP:journals/corr/abs-2106-11872,
+  author    = {Donglin Zhuang and Xingyao Zhang and Shuaiwen Leon Song and Sara Hooker},
+  title     = {Randomness In Neural Network Training: Characterizing The Impact of Tooling},
+  journal   = {CoRR},
+  volume    = {abs/2106.11872},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2106.11872},
+  archivePrefix = {arXiv},
+  eprint    = {2106.11872},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-2106-11872.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 ```
