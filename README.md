@@ -92,7 +92,7 @@ python ./official/vision/image_classification/classifier_trainer.py --mode=train
 ## Measuring Deterministic Overhead
 We use nvprof profiler to collect GPU time duration. The performance data is collected over 100 training iterations.
 
-### Profiling resnet50
+### Profiling ResNet50
 ```
 # profiling model in non-deterministic training
 nvprof python -m training_script.overhead_test --model_name resnet50 --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format
@@ -112,7 +112,8 @@ nvprof python -m training_script.overhead_test --model_name $KERNEL_SIZE --batch
 # profiling model in deterministic training
 nvprof python -m training_script.overhead_test --model_name $KERNEL_SIZE --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format --deterministic_tf
 ```
-
+### Other models
+Please refer complete model list in [here](https://github.com/usyd-fsalab/NeuralNetworkRandomness/blob/8eabe432e9b5f6033f5b3da61eda0a3e5a355f26/training_script/overhead_test.py#L23)
 
 # Cite This Paper
 ```
