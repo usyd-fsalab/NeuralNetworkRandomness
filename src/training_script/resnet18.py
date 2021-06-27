@@ -1,9 +1,3 @@
-"""
-Adapted from keras example cifar10_cnn.py and github.com/raghakot/keras-resnet
-Train ResNet-18 on the CIFAR10 small images dataset.
-GPU run command with Theano backend (with TensorFlow, the GPU is automatically used):
-    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python cifar10.py
-"""
 from __future__ import print_function
 
 import argparse
@@ -36,19 +30,10 @@ import argparse
 import os
 from ..common import input_pipeline
 
-
 tf.io.gfile.makedirs(args.ckpt_folder)
 physical_devices = tf.config.list_physical_devices('GPU')
 for gpu in physical_devices:
     tf.config.experimental.set_memory_growth(gpu, True)
-
-if args.fp16:
-    from tensorflow.keras import mixed_precision
-    policy = mixed_precision.Policy('mixed_float16')
-    mixed_precision.set_global_policy(policy)
-    print('Use Tensor Cores.')
-    print('Compute dtype: %s' % policy.compute_dtype)
-    print('Variable dtype: %s' % policy.variable_dtype)
 
 if args.tpu:
     from tensorflow.keras import mixed_precision

@@ -1,4 +1,4 @@
 [submodule "models"]
-	path = models
+	path = src/models
 	url = https://github.com/donglin-workspace/models.git
 	branch = experiment

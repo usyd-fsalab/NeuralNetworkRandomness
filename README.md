@@ -27,48 +27,48 @@ Below flags can be used to control different factors of noise on demand.
 ## Three layer small CNN
 ```
 # ALGO+IMPL
-python -m training_script.smallcnn --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --eppchs 200 
+python -m src.training_script.smallcnn --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --epochs 200 
 # ALGO
-python -m training_script.smallcnn --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --eppchs 200 --deterministic_tf
+python -m src.training_script.smallcnn --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --epochs 200 --deterministic_tf
 # IMPL
-python -m training_script.smallcnn --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --eppchs 200 --deterministic_init --deterministic_input
+python -m src.training_script.smallcnn --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --epochs 200 --deterministic_init --deterministic_input
 # Control (fully deterministic)
-python -m training_script.smallcnn --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --eppchs 200 --deterministic_init --deterministic_input --deterministic_tf
+python -m src.training_script.smallcnn --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --epochs 200 --deterministic_init --deterministic_input --deterministic_tf
 ```
 
 ## ResNet18 CIFAR10
 ```
 # ALGO+IMPL
-python -m training_script.resnet18 --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --num_epoch 200 
+python -m src.training_script.resnet18 --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --num_epoch 200 
 # ALGO
-python -m training_script.resnet18 --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_tf
+python -m src.training_script.resnet18 --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_tf
 # IMPL
-python -m training_script.resnet18 --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input
+python -m src.training_script.resnet18 --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input
 # Control (fully deterministic)
-python -m training_script.resnet18 --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input --deterministic_tf
+python -m src.training_script.resnet18 --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input --deterministic_tf
 ```
 
 ## ResNet18 CIFAR100
 ```
 # ALGO+IMPL
-python -m training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --num_epoch 200 
+python -m src.training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_algoimpl/ --lr 4e-4 --batch_size 128 --num_epoch 200 
 # ALGO
-python -m training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_tf
+python -m src.training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_algo/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_tf
 # IMPL
-python -m training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input
+python -m src.training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_impl/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input
 # Control (fully deterministic)
-python -m training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input --deterministic_tf
+python -m src.training_script.resnet18 --dataset cifar100 --ckpt_folder ./logs_control/ --lr 4e-4 --batch_size 128 --num_epoch 200 --deterministic_init --deterministic_input --deterministic_tf
 ```
 ## ResNet18 CelebA
 ```
 # ALGO+IMPL
-python -m training_script.resnet_celeba --ckpt_folder ./logs_algoimpl/ 
+python -m src.training_script.resnet_celeba --ckpt_folder ./logs_algoimpl/ 
 # ALGO
-python -m training_script.resnet_celeba --ckpt_folder ./logs_algo/ --deterministic_impl
+python -m src.training_script.resnet_celeba --ckpt_folder ./logs_algo/ --deterministic_impl
 # IMPL
-python -m training_script.resnet_celeba --ckpt_folder ./logs_impl/ --deterministic_algo
+python -m src.training_script.resnet_celeba --ckpt_folder ./logs_impl/ --deterministic_algo
 # Control (fully deterministic)
-python -m training_script.resnet_celeba --ckpt_folder ./logs_control/ --deterministic_algo --deterministic_impl
+python -m src.training_script.resnet_celeba --ckpt_folder ./logs_control/ --deterministic_algo --deterministic_impl
 ```
 
 ## ResNet50 ImageNet
@@ -95,10 +95,10 @@ We use nvprof profiler to collect GPU time duration. The performance data is col
 ### Profiling ResNet50
 ```
 # profiling model in non-deterministic training
-nvprof python -m training_script.overhead_test --model_name resnet50 --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format
+nvprof python -m src.training_script.overhead_test --model_name resnet50 --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format
 
 # profiling model in deterministic training
-nvprof python -m training_script.overhead_test --model_name resnet50 --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format --deterministic_tf
+nvprof python -m src.training_script.overhead_test --model_name resnet50 --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format --deterministic_tf
 ```
 
 ### Profiling six-layer CNN
@@ -107,14 +107,27 @@ nvprof python -m training_script.overhead_test --model_name resnet50 --batch_siz
 # cnn kernel size can be 1 3 5 7
 export KERNEL_SIZE=3
 # profiling model in non-deterministic training
-nvprof python -m training_script.overhead_test --model_name $KERNEL_SIZE --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format
+nvprof python -m src.training_script.overhead_test --model_name $KERNEL_SIZE --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format
 
 # profiling model in deterministic training
-nvprof python -m training_script.overhead_test --model_name $KERNEL_SIZE --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format --deterministic_tf
+nvprof python -m src.training_script.overhead_test --model_name $KERNEL_SIZE --batch_size 128 --data_dir /path/to/imagenet/data/in/tfds/format --deterministic_tf
 ```
 ### Other models
-Please refer complete model list in [here](https://github.com/usyd-fsalab/NeuralNetworkRandomness/blob/8eabe432e9b5f6033f5b3da61eda0a3e5a355f26/training_script/overhead_test.py#L23)
-
+Other supported model names in profiling script including:
+```
+resnet50
+resnet101
+resnet152
+inceptionv3
+xception
+densenet121
+densenet169
+densenet201
+mobilenet
+vgg16
+vgg19
+efficientnetb0
+```
 # Cite This Paper
 ```
 @article{DBLP:journals/corr/abs-2106-11872,

@@ -21,8 +21,6 @@ if args.deterministic_tf:
 
 
 def get_model(model_name, input_shape=(224, 224, 3), num_classes=1000):
-    # if model_name == 'resnet18':
-    #     return ResNet18(classes=num_classes, input_shape=input_shape, seed=None, weight_decay=0)
     if model_name == 'resnet50':
         return tf.keras.applications.ResNet50(weights=None, input_shape=input_shape, classes=num_classes)
     if model_name == 'resnet101':
