@@ -72,11 +72,11 @@ python -m src.training_script.resnet_celeba --ckpt_folder ./logs_control/ --dete
 ```
 
 ## ResNet50 ImageNet
-1. Config how many GPUs is available for trianing in ./models/official/vision/image_classification/configs/examples/resnet/imagenet/gpu.yaml (default is 4)
+1. Config how many GPUs is available for trianing in .src/models/official/vision/image_classification/configs/examples/resnet/imagenet/gpu.yaml (default is 4)
 2. Config other parameter in gpu.ymal file if needed. Do not change it if you would like to use same configuration in paper.
 ```
-cd models
-export PYTHONPATH=/absolute/path/to/NeuralNetworkRandomness/models:${PYTHONPATH}
+cd src/models
+export PYTHONPATH=/absolute/path/to/NeuralNetworkRandomness/src/models:${PYTHONPATH}
 # ImageNet dataset is expected stored in format that can be parsed by tensorflow_dataset (tfds.load)
 export IMAGENET_DATADIR=/path/to/data 
 # ALGO+IMPL
