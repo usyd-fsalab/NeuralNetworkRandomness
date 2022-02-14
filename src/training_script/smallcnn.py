@@ -14,6 +14,8 @@ parser.add_argument('--tpu_address', type=str, default=None, help='')
 parser.add_argument('--fp16', action='store_true', help='')
 parser.add_argument('--bn', action='store_true', help='')
 parser.add_argument('--data_dir', type=str, default=None, help='')
+parser.add_argument('--fast', action='store_true', help='Fast execution. Used to verify functional instead of correctness')
+parser.add_argument('--dataset', choices=['cifar10', 'cifar100'], default='cifar10')
 
 args = parser.parse_args()
 
@@ -63,7 +65,7 @@ if args.tpu:
   print("All devices: ", tf.config.list_logical_devices('TPU'))
   strategy = tf.distribute.TPUStrategy(resolver)
 
-dataset = tfds.load('cifar10', data_dir=args.data_dir)
+dataset = tfds.load(args.dataset, data_dir=args.data_dir)
 
 
 trainloader, testloader = dataset['train'].cache(), dataset['test'].cache()
@@ -71,8 +73,6 @@ trainloader, testloader = dataset['train'].cache(), dataset['test'].cache()
 AUTO = tf.data.experimental.AUTOTUNE
 BATCH_SIZE = args.batch_size
 IMG_SHAPE = 32
-
-
 
 def preprocess_image(data):
   img = tf.cast(data['image'], tf.float32)
@@ -103,6 +103,11 @@ testloader = (
     .batch(BATCH_SIZE)
     .prefetch(AUTO)
 )
+
+if args.fast:
+  trainloader = trainloader.take(1)
+  testloader = testloader.take(1)
+  args.epochs = 1
 
 def Model():
   inputs = keras.layers.Input(shape=(IMG_SHAPE, IMG_SHAPE, 3))

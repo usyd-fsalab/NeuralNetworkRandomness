@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
-from ..common.small_cnns import SmallCNN
+from ..common.cnns import MediumCNN
 import argparse
 import os 
 parser = argparse.ArgumentParser()
@@ -18,7 +18,6 @@ if args.deterministic_tf:
     print('Enabling deterministic tensorflow operations and cuDNN...')
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     os.environ["TF_CUDNN_DETERMINISTIC"] = "1"
-
 
 def get_model(model_name, input_shape=(224, 224, 3), num_classes=1000):
     if model_name == 'resnet50':
@@ -53,25 +52,23 @@ def get_model(model_name, input_shape=(224, 224, 3), num_classes=1000):
         return tf.keras.applications.EfficientNetB4(weights=None, input_shape=input_shape, classes=num_classes)
     if model_name == 'efficientnetb7':
         return tf.keras.applications.EfficientNetB7(weights=None, input_shape=input_shape, classes=num_classes)
-    if model_name == '1':
-        return SmallCNN(1)
-    if model_name == '3':
-        return SmallCNN(3)
-    if model_name == '5':
-        return SmallCNN(5)
-    if model_name == '7':
-        return SmallCNN(7)
+    if model_name == 'MediumCNN 1*1':
+        return MediumCNN(1)
+    if model_name == 'MediumCNN 3*3':
+        return MediumCNN(3)
+    if model_name == 'MediumCNN 5*5':
+        return MediumCNN(5)
+    if model_name == 'MediumCNN 7*7':
+        return MediumCNN(7)
     raise Exception('Model Not Implemented')
 
 def pre_process(data):
-    image = tf.reshape(data['image'], [224, 224, 3])
+    image = tf.image.resize(data['image'], [224, 224])
     label = tf.one_hot(data['label'], depth=1000)
     return image, label
 
 model = get_model(args.model_name)
 model.compile(optimizer='adam', loss='categorical_crossentropy')
-model.summary()
-
 
 train_loader = tfds.load('imagenet2012', data_dir=args.data_dir)['train']
 

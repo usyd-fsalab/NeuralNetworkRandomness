@@ -55,5 +55,6 @@ def get_data(dataset_name, batch_size, shuffle_seed, tpu=False, data_dir=None):
         return get_cifar_input(dataset, batch_size, shuffle_seed, tpu)
     elif dataset_name == 'cifar100':
         num_classes = 100
+        return get_cifar_input(dataset, batch_size, shuffle_seed, tpu)
     else:
         raise Exception(f'Unexpedted dataset {dataset_name}')

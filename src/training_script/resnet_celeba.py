@@ -3,15 +3,16 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--lr', type=float, default=1e-3)
 parser.add_argument('--ckpt_folder', type=str, required=True)
-parser.add_argument('--deterministic_algo', action='store_true')
-parser.add_argument('--deterministic_impl', action='store_true')
+parser.add_argument('--deterministic_init', action='store_true')
+parser.add_argument('--deterministic_input', action='store_true')
+parser.add_argument('--deterministic_tf', action='store_true')
 parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--tpu', action='store_true')
 parser.add_argument('--tpu_zone', type=str, default=None)
 parser.add_argument('--tpu_project', type=str, default=None)
 parser.add_argument('--tpu_address', type=str, default=None)
-parser.add_argument('--test', action='store_true')
 parser.add_argument('--data_dir', type=str, default=None, help='')
+parser.add_argument('--fast', action='store_true', help='Fast execution. Used to verify functional instead of correctness')
 
 args = parser.parse_args()
 
@@ -19,6 +20,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from ..common.resnet import ResNet18
 import os
+import numpy as np
 
 
 if not args.tpu:
@@ -26,7 +28,7 @@ if not args.tpu:
     for gpu in physical_devices:
         tf.config.experimental.set_memory_growth(gpu, True)
 
-if args.deterministic_impl:
+if args.deterministic_tf:
     print('Enabling deterministic tensorflow operations and cuDNN...')
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     os.environ["TF_CUDNN_DETERMINISTIC"] = "1"
@@ -66,9 +68,6 @@ def get_celeba_input(dataset, batch_size, shuffle_seed):
     test_loader = (dataset['test'].map(celebA_transform, num_parallel_calls=tf.data.experimental.AUTOTUNE)
                 .batch(batch_size)
                 .prefetch(tf.data.experimental.AUTOTUNE))
-    if args.test:
-        train_loader = train_loader.take(10)
-        test_loader = test_loader.take(10)
     return train_loader, test_loader
 
 def save_model(epoch, logs):
@@ -83,24 +82,38 @@ def lr_scheduler(epoch):
     print('new lr:%.2e' % new_lr)
     return new_lr
 
-if args.deterministic_algo:
-    algo_seed = 1
+if args.deterministic_input:
+    shuffle_seed = 1
 else:
-    algo_seed = None
+    shuffle_seed = None
+if args.deterministic_init:
+    init_seed = 1
+else:
+    init_seed = None
 
 dataset = tfds.load('celeb_a', data_dir=args.data_dir)
 
-train_loader, test_loader = get_celeba_input(dataset, args.batch_size, algo_seed)
+train_loader, test_loader = get_celeba_input(dataset, args.batch_size, shuffle_seed)
 
+if args.fast:
+    train_loader = train_loader.take(1)
+    test_loader = test_loader.take(1)
+    args.epochs = 1
 
-model = ResNet18(classes=40, input_shape=(128, 128, 3), seed=algo_seed, weight_decay=0, activation='sigmoid')
+model = ResNet18(classes=40, input_shape=(128, 128, 3), seed=init_seed, weight_decay=0, activation='sigmoid')
 optimizer = tf.keras.optimizers.Adam(learning_rate=args.lr)
 model_checkpoint = tf.keras.callbacks.LambdaCallback(on_epoch_end=save_model)
 csv_logger = tf.keras.callbacks.CSVLogger(os.path.join(args.ckpt_folder, 'log.csv'))
 loss = tf.keras.losses.BinaryCrossentropy()
 binary_acc = tf.keras.metrics.BinaryAccuracy(name='binary_accuracy', threshold=0.5)
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)
-model.compile(optimizer=optimizer, loss=loss, metrics=[binary_acc])
+true_positives = tf.keras.metrics.TruePositives(name='true_positives')
+true_negatives = tf.keras.metrics.TrueNegatives(name='true_negatives')
+false_positives = tf.keras.metrics.FalsePositives(name='false_positives')
+false_negatives = tf.keras.metrics.FalseNegatives(name='false_negatives')
+
+model.compile(optimizer=optimizer, loss=loss, metrics=[binary_acc, true_positives, true_negatives, false_positives, false_negatives])
+
 callbacks = [reduce_lr, model_checkpoint]
 if not args.tpu:
     callbacks.append(csv_logger)

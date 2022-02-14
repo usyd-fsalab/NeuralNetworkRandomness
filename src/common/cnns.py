@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def SmallCNN(kernel_size):
+def MediumCNN(kernel_size):
     inputs = tf.keras.layers.Input(shape=(224, 224, 3))
     x = inputs
     channel = 16

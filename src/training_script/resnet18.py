@@ -3,7 +3,7 @@ from __future__ import print_function
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=128)
-parser.add_argument('--num_epoch', type=int, default=200)
+parser.add_argument('--epochs', type=int, default=200)
 parser.add_argument('--lr', type=float, required=True)
 parser.add_argument('--deterministic_input', action='store_true')
 parser.add_argument('--deterministic_init', action='store_true')
@@ -18,6 +18,8 @@ parser.add_argument('--data_dir', type=str, default=None)
 parser.add_argument('--l2', type=float, default=0.0)
 parser.add_argument('--dropout', action='store_true')
 parser.add_argument('--optimizer', type=str, choices=['adam', 'sgd'], default='adam')
+parser.add_argument('--fast', action='store_true', help='Fast execution. Used to verify functional instead of correctness')
+
 args = parser.parse_args()
 
 import tensorflow as tf
@@ -55,8 +57,6 @@ if args.deterministic_tf:
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     os.environ["TF_CUDNN_DETERMINISTIC"] = "1"
 
-
-batch_size = args.batch_size
 if args.dataset == 'cifar10':
     nb_classes = 10
 elif args.dataset == 'cifar100':
@@ -68,7 +68,7 @@ steps_per_epoch = {
     'cifar100' : math.ceil(50000 / args.batch_size)
 }
 
-nb_epoch = args.num_epoch
+nb_epoch = args.epochs
 learning_rate = args.lr
 # input image dimensions
 img_rows, img_cols = 32, 32
@@ -93,7 +93,10 @@ else:
 
 train_data, test_data = input_pipeline.get_data(args.dataset, args.batch_size, shuffle_seed=shuffle_seed, tpu=args.tpu, data_dir=args.data_dir)
 
-
+if args.fast:
+    train_data = train_data.take(1)
+    test_data = test_data.take(1)
+    args.epochs = 1
 
 if args.tpu:
     with strategy.scope():
@@ -109,7 +112,7 @@ def lr_scheduler(epoch):
     return new_lr
 
 def save_prediction(epoch, logs):
-    if epoch == 9 or (epoch + 1) % 50 == 0 or epoch == args.num_epoch - 1:
+    if epoch == 9 or (epoch + 1) % 50 == 0 or epoch == args.epochs - 1:
         pred_array = np.array([]).reshape(0, nb_classes)
         for x, y in test_data:
             pred = model(x)
@@ -123,7 +126,7 @@ def save_model(epoch, logs):
     save_options = None
     if args.tpu:
         save_options = tf.saved_model.SaveOptions(experimental_io_device='/job:localhost')
-    if epoch == 9 or (epoch + 1) % 50 == 0 or epoch == args.num_epoch - 1:
+    if epoch == 9 or (epoch + 1) % 50 == 0 or epoch == args.epochs - 1:
         tf.keras.models.save_model(model, os.path.join(args.ckpt_folder, f'ckpt{epoch}.h5'), include_optimizer=False, options=save_options)
 
 
@@ -137,6 +140,6 @@ callbacks = [reduce_lr, model_checkpoint, save_pred_callback]
 if not args.tpu:
     callbacks.append(csv_logger)
 
-model.fit(train_data, epochs=args.num_epoch, callbacks=callbacks, validation_data=test_data, shuffle=False, steps_per_epoch=steps_per_epoch[args.dataset])
+model.fit(train_data, epochs=args.epochs, callbacks=callbacks, validation_data=test_data, shuffle=False, steps_per_epoch=steps_per_epoch[args.dataset])
 
 ###########################################
