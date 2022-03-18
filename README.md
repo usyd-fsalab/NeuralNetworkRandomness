@@ -15,7 +15,7 @@ cd NeuralNetworkRandomness
 pip install -r requirements.txt
 ```
 
-# Run Experiment
+# Train models under different deterministic constrain
 Below flags can be used to control different factors of noise on demand.
 ```
 --deterministic_init # deterministic weight initialization
